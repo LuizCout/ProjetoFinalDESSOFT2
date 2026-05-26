@@ -251,3 +251,44 @@ PODER_VEL_DURACAO = 300   # Duração total do turbo em frames (300 frames = 5 s
 poder_bomb_ativo  = False  # Flag que indica se o poder bomba (destruição de barris) está ativo
 poder_bomb_timer  = 0      # Contador regressivo em frames que controla a duração da bomba ativa
 PODER_BOMB_DURACAO = 240   # Duração total da bomba em frames (240 frames = 4 segundos a 60 FPS)
+
+# FUNÇÃO: criar_andares
+# ============================================================
+
+def criar_andares():
+    # Reconstrói toda a estrutura de plataformas e escadas da fase atual
+    # Alterna o lado do buraco em cada andar, imitando a estrutura do Donkey Kong original
+
+    andares.clear()    # Remove todos os andares existentes da lista
+    plataformas.clear()  # Remove todas as plataformas existentes da lista
+    escadas.clear()    # Remove todas as escadas existentes da lista
+
+    y = 1350                    # Define a posição y do primeiro andar (mais baixo), perto do fundo do mundo
+    lado_buraco_esquerda = False  # Controla qual lado tem o buraco; começa com buraco à direita
+
+    for _ in range(12):  # Cria 12 andares empilhados verticalmente
+
+        if fase_atual == 1:
+            # Na fase 1 as plataformas são maiores (720px de largura)
+            plat = pygame.Rect(80, y, 720, ESPESSURA) if lado_buraco_esquerda else pygame.Rect(0, y, 720, ESPESSURA)
+            # Se o buraco está à esquerda, a plataforma começa em x=80; senão começa em x=0
+        else:
+            # Na fase 2 as plataformas são menores (620px), tornando o jogo mais difícil
+            plat = pygame.Rect(130, y, 620, ESPESSURA) if lado_buraco_esquerda else pygame.Rect(0, y, 620, ESPESSURA)
+
+        andares.append({"rect": plat, "y": y, "buraco_esquerda": lado_buraco_esquerda})
+        # Adiciona um dicionário com o rect da plataforma, sua posição y e qual lado tem o buraco
+
+        plataformas.append(plat)  # Adiciona o rect da plataforma também à lista simples usada para colisões
+
+        y -= ALTURA_ANDAR                          # Sobe a posição y para o próximo andar (subtrai porque y aumenta para baixo)
+        lado_buraco_esquerda = not lado_buraco_esquerda  # Alterna o lado do buraco para criar o padrão zigue-zague
+
+    for i in range(len(andares) - 1):  # Itera pelos andares criando uma escada entre cada par de andares adjacentes
+        baixo, cima = andares[i], andares[i + 1]  # Define andar inferior e andar superior do par atual
+
+        x = 100 if i % 2 == 0 else 550 if fase_atual == 1 else 150 if i % 2 == 0 else 600
+        # Posiciona a escada: nos andares pares à esquerda, nos ímpares à direita; valores diferentes por fase
+
+        escadas.append(pygame.Rect(x, cima["y"], 30, baixo["y"] - cima["y"]))
+        # Cria o rect da escada: começa no topo do andar superior, tem 30px de largura e vai até o andar inferior
