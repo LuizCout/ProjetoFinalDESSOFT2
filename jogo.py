@@ -357,22 +357,6 @@ def atualizar_camera():
     camera_y = max(0, min(camera_y, MUNDO_ALTURA - ALTURA))
     # Limita a câmera entre 0 e (MUNDO_ALTURA - ALTURA) para não mostrar além dos limites do mundo
 
-#FUNÇÃO: atualizar_camera
-
-
-def atualizar_camera():
-    # Calcula a posição vertical da câmera para seguir o jogador
-    # Mantém o jogador próximo ao centro vertical da tela
-
-    global camera_y  # Declara que vai modificar a variável global camera_y (não criar uma local)
-
-    camera_y = player.y - ALTURA // 2
-    # Posiciona a câmera para que o jogador fique no centro vertical da tela
-    # Subtrai metade da altura da tela da posição y do jogador
-
-    camera_y = max(0, min(camera_y, MUNDO_ALTURA - ALTURA))
-    # Limita a câmera entre 0 e (MUNDO_ALTURA - ALTURA) para não mostrar além dos limites do mundo
-
 
 # FUNÇÃO: resetar
 
@@ -391,3 +375,59 @@ def resetar():
     vel_y = 0  # Zera a velocidade vertical para o jogador não continuar caindo
 
     barris.clear()  # Remove todos os barris da tela para evitar colisão imediata ao respawnar
+
+
+# FUNÇÃO: spawn_barril
+
+
+def spawn_barril():
+    # Cria um novo barril na posição do inimigo no topo do cenário
+    # Na fase 2 há maior chance de barris rápidos, aumentando a dificuldade
+
+    topo = andares[-1]  # Obtém o dicionário do andar mais alto (último da lista, que é o topo do cenário)
+
+    chance_rapido = 0.3 if fase_atual == 1 else 0.55
+    # Define 30% de chance de barril rápido na fase 1 e 55% na fase 2
+
+    tipo = "rapido" if random.random() < chance_rapido else "normal"
+    # Sorteia o tipo do barril: "rapido" se o número aleatório (0.0-1.0) for menor que a chance; senão "normal"
+
+    barris.append({
+        "rect": pygame.Rect(macaco_pos[0], topo["y"] - 40, 20, 20),
+        # Cria o rect do barril na posição x do macaco, logo acima do andar do topo, com tamanho 20x20 pixels
+        "dir": -1,   # Define direção inicial do barril como -1 (movendo para a esquerda)
+        "tipo": tipo  # Armazena o tipo do barril ("rapido" ou "normal") no dicionário
+    })
+
+
+# FUNÇÃO: avancar_fase
+
+    # Incrementa a fase atual e configura o jogo para a nova fase
+    # Se ultrapassar a fase 2, exibe a tela de vitória e encerra o jogo
+
+    global fase_atual, barris, macaco_pos, objetivo, tempo_spawn  # Declara variáveis globais que serão modificadas
+    global poder_vel_ativo, poder_vel_timer, poder_bomb_ativo, poder_bomb_timer  # Mais variáveis globais de poder
+    global item_respawn_timer  # Variável global do timer de reaparecimento de itens
+
+    fase_atual += 1  # Incrementa o número da fase em 1
+
+    if fase_atual > 2:    # Verifica se passou da última fase disponível (fase 2)
+        tela_vitoria()    # Exibe a tela de vitória com a pontuação final
+        pygame.quit()     # Encerra todos os módulos do pygame
+        sys.exit()        # Finaliza o programa Python
+
+    # Reseta todos os timers e poderes para o estado inicial da nova fase
+    tempo_spawn         = 0      # Zera o contador de spawn de barris
+    item_respawn_timer  = 0      # Zera o timer de reaparecimento de itens
+    poder_vel_ativo     = False  # Desativa o poder de velocidade
+    poder_vel_timer     = 0      # Zera o timer do poder de velocidade
+    poder_bomb_ativo    = False  # Desativa o poder bomba
+    poder_bomb_timer    = 0      # Zera o timer do poder bomba
+
+    criar_andares()   # Reconstrói as plataformas e escadas com as configurações da nova fase
+    spawnar_itens()   # Distribui novos itens pelos andares da nova fase
+
+    resetar()         # Reposiciona o jogador e limpa os barris
+    barris.clear()    # Garante que a lista de barris esteja completamente vazia (redundância de segurança)
+
+    tela_transicao(fase_atual)  # Exibe a tela de transição com o número da nova fase antes de continuar
