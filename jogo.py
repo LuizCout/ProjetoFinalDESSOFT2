@@ -797,58 +797,6 @@ while True:          # Loop infinito que mantém o jogo rodando até o programa 
     frame_atual = (frame_atual + vel_anim) % len(frames) if movendo else 0
     sprite = frames[int(frame_atual)]
 
-if vel_x < 0:
-    sprite = pygame.transform.flip(sprite, True, False)
-
-
-    TELA.blit(sprite, (player.x, player.bottom - sprite.get_height() - camera_y + 10))
-    # Desenha o sprite do jogador alinhando sua base com o fundo do rect de colisão, ajustando pela câmera e 10px extras
- 
-    # ============================================================
-    # RENDERIZAÇÃO DOS BARRIS
-    # ============================================================
- 
-    for b in barris:  # Itera por todos os barris ativos na lista
-        draw_y = b["rect"].bottom - barril_img.get_height() - camera_y
-        # Calcula a posição y de desenho: alinha a base da imagem com o fundo do rect do barril, descontando a câmera
-        TELA.blit(barril_img, (b["rect"].x, draw_y))
-        # Desenha a imagem do barril na posição calculada
-        if barril.colliderect(player):       # Verifica se o barril atual colide com o rect do jogador
-            if poder_bomb_ativo:             # Verifica se o poder bomba está ativo
-                barris_remover.append(b)     # Adiciona o barril à lista de barris a serem removidos (destruído pela bomba)
-                pontuacao += 10              # Adiciona 10 pontos por destruir o barril com a bomba
-            else:                            # Se o poder bomba não está ativo
-                vidas -= 1                   # Subtrai uma vida do jogador
-                resetar()                    # Reposiciona o jogador e limpa os barris
-
-                if vidas <= 0:               # Verifica se o jogador ficou sem vidas
-                    tela_game_over()         # Exibe a tela de game over
-                    pygame.quit()            # Encerra o pygame
-                sys.exit()  
- 
-
-    # HUD (interface do usuário na tela)
-
-
-    texto     = fonte.render(f"Pontuação: {pontuacao}", True, BRANCO)
-    # Renderiza o texto de pontuação com o valor atual em cor branca com antialiasing ativado
-
-    vidas_txt = fonte.render(f"Vidas: {vidas}", True, BRANCO)
-    # Renderiza o texto de vidas com o valor atual em cor branca
-
-    fase_txt  = fonte.render(f"Fase: {fase_atual}", True, AMARELO)
-    # Renderiza o texto de fase com o número atual em cor amarela
-    x_pont = LARGURA - texto.get_width() - 15
-    TELA.blit(texto, (x_pont, 10))
-    # Desenha o texto de pontuação na tela na posição x_pont, 10 pixels do topo
-
-    TELA.blit(vidas_txt, (10, 10))
-    # Desenha o texto de vidas na tela no canto superior esquerdo (x=10, y=10)
-
-    TELA.blit(fase_txt, (LARGURA // 2 - fase_txt.get_width() // 2, 10))
-    # Desenha o texto de fase centralizado horizontalmente na tela, 10 pixels do topo
-
-    # ============================================================
     # ATUALIZAÇÃO FINAL DA TELA
     # ============================================================
 
