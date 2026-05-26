@@ -609,3 +609,31 @@ while True:          # Loop infinito que mantém o jogo rodando até o programa 
                 pygame.quit()            # Encerra o pygame
                 sys.exit()               # Termina o programa
  
+# ============================================================
+    # HUD (interface do usuário na tela)
+    # ============================================================
+
+    texto     = fonte.render(f"Pontuação: {pontuacao}", True, BRANCO)
+    # Renderiza o texto de pontuação com o valor atual em cor branca com antialiasing ativado
+
+    vidas_txt = fonte.render(f"Vidas: {vidas}", True, BRANCO)
+    # Renderiza o texto de vidas com o valor atual em cor branca
+
+    fase_txt  = fonte.render(f"Fase: {fase_atual}", True, AMARELO)
+    # Renderiza o texto de fase com o número atual em cor amarela
+
+    TELA.blit(texto, (x_pont, 10))
+    # Desenha o texto de pontuação na tela na posição x_pont, 10 pixels do topo
+
+    TELA.blit(vidas_txt, (10, 10))
+    # Desenha o texto de vidas na tela no canto superior esquerdo (x=10, y=10)
+
+    TELA.blit(fase_txt, (LARGURA // 2 - fase_txt.get_width() // 2, 10))
+    # Desenha o texto de fase centralizado horizontalmente na tela, 10 pixels do topo
+
+    # ============================================================
+    # ATUALIZAÇÃO FINAL DA TELA
+    # ============================================================
+
+    pygame.display.flip()
+    # Atualiza toda a janela com o conteúdo desenhado neste frame (exibe o frame ao jogador)
