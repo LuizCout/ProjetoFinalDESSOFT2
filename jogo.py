@@ -19,3 +19,17 @@ pygame.mixer.music.play(-1)          # Começa a tocar a música; o argumento -1
 
 LARGURA, ALTURA = 900, 800   # Define a largura (900 pixels) e a altura (800 pixels) da janela visível do jogo
 MUNDO_ALTURA = 1400          # Define a altura total do mundo do jogo (maior que a tela), permitindo scroll vertical com câmera
+
+# ============================================================
+# CRIAÇÃO DA JANELA
+# ============================================================
+
+TELA = pygame.display.set_mode((LARGURA, ALTURA))  # Cria a janela do jogo com as dimensões definidas acima e armazena na variável TELA
+pygame.display.set_caption("Dino Barrel")           # Define o título que aparece na barra superior da janela do jogo
+
+# ============================================================
+# CONTROLE DE TEMPO
+# ============================================================
+
+CLOCK = pygame.time.Clock()  # Cria um objeto de relógio que controla quantos frames por segundo o jogo roda
+FPS = 60                     # Define a taxa de quadros por segundo em 60 FPS (frames per second)
