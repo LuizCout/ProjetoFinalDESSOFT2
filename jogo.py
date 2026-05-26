@@ -157,14 +157,11 @@ def desenhar_texto_arcade(surface, fonte, texto, cor, contorno, x, y, espaco_ext
 # FUNÇÃO: tela_inicio
 
  
-def tela_inicio(): 
-    # Exibe a tela inicial animada do jogo e aguarda o jogador pressionar ENTER para iniciar
- 
-    fontes = ["Courier New", "Consolas", "Lucida Console", "monospace"]  # Lista de fontes monoespaçadas com estilo arcade preferidas
-    nomes = [f.lower() for f in pygame.font.get_fonts()]                 # Obtém a lista de todas as fontes instaladas no sistema e converte para minúsculas
- 
-    # Seleciona a primeira fonte da lista preferida que esteja disponível no sistema; usa "monospace" como fallback
+def tela_inicio():
+    fontes = ["Courier New", "Consolas", "Lucida Console", "monospace"]
+    nomes = [f.lower() for f in pygame.font.get_fonts()]
     fonte_nome = next((f for f in fontes if f.lower() in nomes), "monospace")
+<<<<<<< HEAD
  
     # Cria objetos de fonte com tamanhos específicos para cada parte da tela inicial
     fonte_titulo = pygame.font.SysFont(fonte_nome, 88, bold=True)   # Fonte grande para o título principal (88px, negrito)
@@ -206,6 +203,34 @@ def tela_inicio():
             y += 28
         pygame.display.flip()
  
+=======
+
+    fonte_titulo = pygame.font.SysFont(fonte_nome, 88, bold=True)
+    fonte_sub    = pygame.font.SysFont(fonte_nome, 30, bold=True)
+
+    t = 0
+
+    while True:
+        CLOCK.tick(FPS)
+        t += 1
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                return
+
+        TELA.fill((15, 10, 30))
+        txt1 = fonte_titulo.render("DINO BARREL", True, (255, 220, 0))
+        txt2 = fonte_sub.render("Pressione ENTER", True, (255, 255, 255))
+
+        TELA.blit(txt1, (LARGURA // 2 - txt1.get_width() // 2, 250))
+        TELA.blit(txt2, (LARGURA // 2 - txt2.get_width() // 2, 360))
+
+        pygame.display.flip()
+>>>>>>> 7ae465e423050f82d084c090e7b5501af48dede0
         # A parte de desenho do fundo animado, título, botão e créditos está omitida no trecho fornecido
         # mas acontece aqui dentro do loop, antes do pygame.display.flip()
 
@@ -558,38 +583,40 @@ def tela_vitoria():
         desenhar_texto_arcade(TELA, fonte_media, f"Pontuacao Final: {pontuacao}", BRANCO, (40, 40, 40), LARGURA // 2, 400, 4)
         pygame.display.flip()
 
-# FUNÇÃO: avancar_fase
+def avancar_fase():
+    global fase_atual, barris, macaco_pos, objetivo, tempo_spawn
+    global poder_vel_ativo, poder_vel_timer, poder_bomb_ativo, poder_bomb_timer
+    global item_respawn_timer
 
+<<<<<<< HEAD
     # Incrementa a fase atual e configura o jogo para a nova fase
     # Se ultrapassar a fase 2, exibe a tela de vitória e encerra o jogo
 def avancar_fase()
     global fase_atual, barris, macaco_pos, objetivo, tempo_spawn  # Declara variáveis globais que serão modificadas
     global poder_vel_ativo, poder_vel_timer, poder_bomb_ativo, poder_bomb_timer  # Mais variáveis globais de poder
     global item_respawn_timer  # Variável global do timer de reaparecimento de itens
+=======
+    fase_atual += 1
 
-    fase_atual += 1  # Incrementa o número da fase em 1
+    if fase_atual > 2:
+        tela_vitoria()
+        pygame.quit()
+        sys.exit()
+>>>>>>> 7ae465e423050f82d084c090e7b5501af48dede0
 
-    if fase_atual > 2:    # Verifica se passou da última fase disponível (fase 2)
-        tela_vitoria()    # Exibe a tela de vitória com a pontuação final
-        pygame.quit()     # Encerra todos os módulos do pygame
-        sys.exit()        # Finaliza o programa Python
+    tempo_spawn = 0
+    item_respawn_timer = 0
+    poder_vel_ativo = False
+    poder_vel_timer = 0
+    poder_bomb_ativo = False
+    poder_bomb_timer = 0
 
-    # Reseta todos os timers e poderes para o estado inicial da nova fase
-    tempo_spawn         = 0      # Zera o contador de spawn de barris
-    item_respawn_timer  = 0      # Zera o timer de reaparecimento de itens
-    poder_vel_ativo     = False  # Desativa o poder de velocidade
-    poder_vel_timer     = 0      # Zera o timer do poder de velocidade
-    poder_bomb_ativo    = False  # Desativa o poder bomba
-    poder_bomb_timer    = 0      # Zera o timer do poder bomba
+    criar_andares()
+    spawnar_itens()
+    resetar()
+    barris.clear()
 
-    criar_andares()   # Reconstrói as plataformas e escadas com as configurações da nova fase
-    spawnar_itens()   # Distribui novos itens pelos andares da nova fase
-
-    resetar()         # Reposiciona o jogador e limpa os barris
-    barris.clear()    # Garante que a lista de barris esteja completamente vazia (redundância de segurança)
-
-    tela_transicao(fase_atual)  # Exibe a tela de transição com o número da nova fase antes de continuar
-
+    tela_transicao(fase_atual)
 # LOOP PRINCIPAL DO JOGO
 # ============================================================
 # Este bloco roda continuamente enquanto o jogo estiver ativo.
