@@ -234,3 +234,20 @@ VEL_BASE      = 3     # Velocidade horizontal normal do jogador em pixels por fr
 VEL_TURBINADA = 7     # Velocidade horizontal com o poder de turbo ativo em pixels por frame
 VEL           = VEL_BASE  # Variável de velocidade atual; começa igual à velocidade base
 PULO          = -7.5  # Velocidade vertical aplicada ao pular (negativa = para cima)
+
+ #ESTADO DO JOGO
+
+vidas     = 3  # Número de vidas do jogador; ao chegar a zero, o jogo termina
+pontuacao = 0  # Pontuação acumulada pelo jogador ao longo do jogo
+
+
+# VARIÁVEIS DOS PODERES
+
+
+poder_vel_ativo  = False  # Flag que indica se o poder de velocidade (turbo) está ativo no momento
+poder_vel_timer  = 0      # Contador regressivo em frames que controla a duração do turbo ativo
+PODER_VEL_DURACAO = 300   # Duração total do turbo em frames (300 frames = 5 segundos a 60 FPS)
+
+poder_bomb_ativo  = False  # Flag que indica se o poder bomba (destruição de barris) está ativo
+poder_bomb_timer  = 0      # Contador regressivo em frames que controla a duração da bomba ativa
+PODER_BOMB_DURACAO = 240   # Duração total da bomba em frames (240 frames = 4 segundos a 60 FPS)
