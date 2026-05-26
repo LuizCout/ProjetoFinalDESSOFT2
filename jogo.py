@@ -431,3 +431,29 @@ def spawn_barril():
     barris.clear()    # Garante que a lista de barris esteja completamente vazia (redundância de segurança)
 
     tela_transicao(fase_atual)  # Exibe a tela de transição com o número da nova fase antes de continuar
+
+# LOOP PRINCIPAL DO JOGO
+# ============================================================
+# Este bloco roda continuamente enquanto o jogo estiver ativo.
+# A cada iteração (frame): lê eventos, processa inputs, atualiza
+# física, verifica colisões, e renderiza tudo na tela.
+ 
+tempo_spawn = 0  # Inicializa o contador de tempo para controlar o intervalo entre spawns de barris
+ 
+while True:          # Loop infinito que mantém o jogo rodando até o programa ser encerrado
+    CLOCK.tick(FPS)  # Aguarda o tempo necessário para manter exatamente 60 frames por segundo
+ 
+    fundo_atual = fundo_img if fase_atual == 1 else fundo_fase2
+    # Seleciona qual imagem de fundo usar: fase 1 usa fundo_img, fase 2 usa fundo_fase2
+ 
+    TELA.blit(fundo_atual, (0, 0))  # Desenha o fundo selecionado na tela a partir da posição (0,0), cobrindo toda a janela
+ 
+    for event in pygame.event.get():          # Lê e processa todos os eventos disponíveis na fila do pygame
+        if event.type == pygame.QUIT:         # Verifica se o evento é o fechamento da janela
+            pygame.quit()                     # Encerra todos os módulos do pygame
+            sys.exit()                        # Termina o processo Python
+ 
+    teclas = pygame.key.get_pressed()  # Captura o estado atual de todas as teclas (True se pressionada, False se não)
+ 
+    VEL = VEL_TURBINADA if poder_vel_ativo else VEL_BASE
+    # Define a velocidade atual: usa velocidade turbinada (7) se o turbo estiver ativo, senão usa a base (3)
