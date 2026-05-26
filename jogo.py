@@ -1,6 +1,6 @@
-# ============================================================
+
 # IMPORTAÇÕES DAS BIBLIOTECAS
-# ============================================================
+
 
 import pygame        # Importa a biblioteca pygame, responsável por criar a janela, desenhar na tela, capturar teclas e reproduzir sons
 import sys           # Importa o módulo sys, usado para encerrar o programa com sys.exit()
@@ -56,3 +56,29 @@ CINZA_PEDRA  = (90, 85, 80)      # Cinza com tom de pedra, usado para desenhar e
 CINZA_PEDRA2 = (120, 110, 100)   # Cinza pedra mais claro, para variações de textura no vulcão
 VERMELHO_LAVA  = (255, 60, 0)    # Vermelho intenso que representa a lava do vulcão
 AMARELO_LAVA   = (255, 200, 0)   # Amarelo quente que representa o brilho incandescente da lava
+
+
+# FUNÇÃO: desenhar_vulcao
+
+
+def desenhar_vulcao(surface, t):
+    # Recebe a superfície onde vai desenhar (surface) e o contador de tempo (t) para animações
+    
+    surface.fill((15, 10, 30))  # Preenche o fundo da tela com azul escuro quase preto, simulando o céu noturno
+
+    # --- Estrelas ---
+    random.seed(42)              # Fixa a semente do gerador aleatório em 42 para que as estrelas apareçam sempre no mesmo lugar
+    for _ in range(120):         # Repete o bloco 120 vezes, criando 120 estrelas no céu
+        sx = random.randint(0, LARGURA)                   # Sorteia a posição horizontal da estrela dentro da largura da tela
+        sy = random.randint(0, int(ALTURA * 0.55))        # Sorteia a posição vertical da estrela no topo (55% superior da tela)
+        brilho = 100 + int(60 * abs(math.sin(t * 0.03 + sx)))  # Calcula o brilho da estrela usando seno para criar efeito de cintilação animada
+        pygame.draw.circle(surface, (brilho, brilho, brilho), (sx, sy), 1)  # Desenha a estrela como um círculo de raio 1 pixel com o brilho calculado
+
+    random.seed()  # Remove a semente fixa, voltando ao comportamento aleatório normal para o resto do código
+
+    # --- Montanhas ao fundo ---
+    montanha = [...]  # Define os vértices do polígono que forma as montanhas ao fundo (lista de tuplas com coordenadas x, y)
+    pygame.draw.polygon(surface, (25, 20, 40), montanha)  # Desenha as montanhas como um polígono preenchido com cor azul-roxo muito escuro
+
+    # A continuação desta função (corpo do vulcão, cratera, etc.) está omitida no trecho fornecido
+    # mas seguiria o mesmo padrão: polígonos para as formas e elipses para a cratera
