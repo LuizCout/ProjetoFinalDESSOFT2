@@ -542,9 +542,9 @@ while True:          # Loop infinito que mantém o jogo rodando até o programa 
         if poder_bomb_timer <= 0:  # Quando o timer chegar a zero
             poder_bomb_ativo = False  # Desativa o poder bomba
  
-    # ============================================================
+
     # COLETA DE ITENS
-    # ============================================================
+    
  
     for item in itens:                                     # Itera por todos os itens do cenário
         if item["ativo"] and player.colliderect(item["rect"]):
@@ -558,4 +558,54 @@ while True:          # Loop infinito que mantém o jogo rodando até o programa 
             else:                                    # Se não for velocidade, é bomba
                 poder_bomb_ativo = True              # Ativa o poder bomba
                 poder_bomb_timer = PODER_BOMB_DURACAO  # Inicia o timer com a duração total da bomba
+    
+    #SPAWN DE BARRIS
+   
+
+    intervalo_spawn = max(40, 120 - pontuacao // 10) if fase_atual == 1 else max(25, 90 - pontuacao // 10)
+    # Calcula o intervalo entre spawns de barris: diminui conforme a pontuação aumenta (mais difícil)
+    # Fase 1: mínimo de 40 frames; Fase 2: mínimo de 25 frames
+
+    tempo_spawn += 1  # Incrementa o contador de tempo desde o último spawn em 1 frame
+
+    if tempo_spawn > intervalo_spawn:  # Verifica se o intervalo de spawn foi atingido
+        spawn_barril()    # Cria um novo barril na posição do inimigo
+        tempo_spawn = 0   # Reinicia o contador de tempo para o próximo spawn
+
+    
+    # MOVIMENTAÇÃO DOS BARRIS
+    
+
+    for b in barris:       # Itera por cada barril presente na lista
+        barril = b["rect"] # Obtém o rect do barril atual para facilitar o acesso
+
+        if fase_atual == 1:
+            velocidade = 6 if b["tipo"] == "rapido" else 3 + pontuacao // 200
+            # Fase 1: barris rápidos movem a 6px/frame; normais têm velocidade crescente com a pontuação
+        else:
+            velocidade = 7 if b["tipo"] == "rapido" else 5 + pontuacao // 150
+            # Fase 2: barris rápidos movem a 7px/frame; normais têm velocidade crescente mais agressiva
+
+        barril.x += velocidade * b["dir"]  # Move o barril horizontalmente: velocidade * direção (-1 ou 1)
+        barril.y += 5                      # Move o barril 5 pixels para baixo a cada frame (desce gradualmente)
+
+        if random.random() < 0.01:  # Com 1% de chance a cada frame
+            b["dir"] *= -1          # Inverte a direção horizontal do barril multiplicando por -1
+
+    
+    # COLISÃO DOS BARRIS COM O JOGADOR
+    
+
+    if barril.colliderect(player):       # Verifica se o barril atual colide com o rect do jogador
+        if poder_bomb_ativo:             # Verifica se o poder bomba está ativo
+            barris_remover.append(b)     # Adiciona o barril à lista de barris a serem removidos (destruído pela bomba)
+            pontuacao += 10              # Adiciona 10 pontos por destruir o barril com a bomba
+        else:                            # Se o poder bomba não está ativo
+            vidas -= 1                   # Subtrai uma vida do jogador
+            resetar()                    # Reposiciona o jogador e limpa os barris
+
+            if vidas <= 0:               # Verifica se o jogador ficou sem vidas
+                tela_game_over()         # Exibe a tela de game over
+                pygame.quit()            # Encerra o pygame
+                sys.exit()               # Termina o programa
  
