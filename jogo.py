@@ -188,3 +188,26 @@ escada_img = pygame.transform.scale(pygame.image.load(r"C:\Users\rezen\Downloads
 
 macaco_img = pygame.transform.scale(pygame.image.load(r"C:\Users\rezen\Downloads\enemy certo.png"), (90, 90)).convert_alpha()
 # Carrega a imagem do inimigo (macaco), redimensiona para 90x90 pixels e converte preservando transparência
+
+# DIVISÃO DA SPRITESHEET EM FRAMES DE ANIMAÇÃO
+# ============================================================
+ 
+FRAME_L, FRAME_A, NUM_FRAMES = 24, 24, 6
+# Define: FRAME_L = largura de cada frame (24px), FRAME_A = altura de cada frame (24px), NUM_FRAMES = total de frames (6)
+ 
+frames = []  # Cria uma lista vazia que vai armazenar os frames individuais do personagem
+ 
+for i in range(NUM_FRAMES):                                      # Itera de 0 a 5, uma vez para cada frame da animação
+    frame = pygame.Surface((FRAME_L, FRAME_A), pygame.SRCALPHA) # Cria uma superfície transparente de 24x24 para receber o frame recortado
+ 
+    frame.blit(sheet, (0, 0), (i * FRAME_L, 0, FRAME_L, FRAME_A))
+    # Copia da spritesheet (sheet) para a superfície (frame):
+    # - Destino na superfície: (0, 0)
+    # - Área de recorte na spritesheet: começa em (i * 24, 0), com tamanho 24x24
+    # Cada iteração avança 24px horizontalmente, pegando o próximo frame
+ 
+    frames.append(pygame.transform.scale(frame, (80, 80)))
+    # Redimensiona o frame de 24x24 para 80x80 pixels e adiciona à lista de frames
+ 
+frame_atual = 0    # Inicializa o índice do frame atual de animação em 0 (primeiro frame)
+vel_anim    = 0.2  # Define a velocidade de troca entre frames (0.2 = avança 20% de um frame por tick)
