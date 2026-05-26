@@ -518,3 +518,44 @@ while True:          # Loop infinito que mantém o jogo rodando até o programa 
             player.bottom = plat.top                  # Alinha o fundo do jogador com o topo da plataforma (pousa sobre ela)
             vel_y = 0                                 # Zera a velocidade vertical, parando a queda
             no_chao = True                            # Marca que o jogador está no chão
+
+    # COLISÃO COM PLATAFORMAS (por baixo - batida na cabeça)
+    # ============================================================
+ 
+    if not na_escada:                                     # Só verifica batida na cabeça se não estiver na escada
+        for plat in plataformas:                          # Itera por todas as plataformas
+            if player.colliderect(plat) and vel_y < 0:   # Colisão com plataforma E jogador subindo (vel_y negativa)
+                player.top = plat.bottom                  # Alinha o topo do jogador com o fundo da plataforma (bate a cabeça)
+                vel_y = 0                                 # Zera a velocidade vertical, impedindo de continuar subindo
+ 
+    # ============================================================
+    # TIMERS DOS PODERES
+    # ============================================================
+ 
+    if poder_vel_ativo:           # Verifica se o poder de velocidade está ativo
+        poder_vel_timer -= 1      # Decrementa o timer do turbo em 1 frame por iteração
+        if poder_vel_timer <= 0:  # Quando o timer chegar a zero
+            poder_vel_ativo = False  # Desativa o poder de velocidade
+ 
+    if poder_bomb_ativo:           # Verifica se o poder bomba está ativo
+        poder_bomb_timer -= 1      # Decrementa o timer da bomba em 1 frame por iteração
+        if poder_bomb_timer <= 0:  # Quando o timer chegar a zero
+            poder_bomb_ativo = False  # Desativa o poder bomba
+ 
+    # ============================================================
+    # COLETA DE ITENS
+    # ============================================================
+ 
+    for item in itens:                                     # Itera por todos os itens do cenário
+        if item["ativo"] and player.colliderect(item["rect"]):
+        # Verifica se o item está ativo E se o jogador colide com ele
+ 
+            item["ativo"] = False  # Marca o item como inativo (coletado), impedindo que seja coletado novamente
+ 
+            if item["tipo"] == "velocidade":         # Verifica se o item coletado é do tipo velocidade
+                poder_vel_ativo = True               # Ativa o poder de velocidade
+                poder_vel_timer = PODER_VEL_DURACAO  # Inicia o timer com a duração total do turbo
+            else:                                    # Se não for velocidade, é bomba
+                poder_bomb_ativo = True              # Ativa o poder bomba
+                poder_bomb_timer = PODER_BOMB_DURACAO  # Inicia o timer com a duração total da bomba
+ 
