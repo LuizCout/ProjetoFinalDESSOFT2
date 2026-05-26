@@ -356,3 +356,38 @@ def atualizar_camera():
 
     camera_y = max(0, min(camera_y, MUNDO_ALTURA - ALTURA))
     # Limita a câmera entre 0 e (MUNDO_ALTURA - ALTURA) para não mostrar além dos limites do mundo
+
+#FUNÇÃO: atualizar_camera
+
+
+def atualizar_camera():
+    # Calcula a posição vertical da câmera para seguir o jogador
+    # Mantém o jogador próximo ao centro vertical da tela
+
+    global camera_y  # Declara que vai modificar a variável global camera_y (não criar uma local)
+
+    camera_y = player.y - ALTURA // 2
+    # Posiciona a câmera para que o jogador fique no centro vertical da tela
+    # Subtrai metade da altura da tela da posição y do jogador
+
+    camera_y = max(0, min(camera_y, MUNDO_ALTURA - ALTURA))
+    # Limita a câmera entre 0 e (MUNDO_ALTURA - ALTURA) para não mostrar além dos limites do mundo
+
+
+# FUNÇÃO: resetar
+
+
+def resetar():
+    # Reposiciona o jogador no início do primeiro andar e limpa os barris da tela
+    # Chamada ao perder uma vida ou avançar de fase
+
+    global vel_x, vel_y, barris  # Declara que vai modificar as variáveis globais vel_x, vel_y e barris
+
+    player.x = andares[0]["rect"].x + 50  # Reposiciona o jogador horizontalmente: início do primeiro andar + 50px
+    player.y = andares[0]["y"] - player.height - 5
+    # Reposiciona o jogador verticalmente logo acima da superfície do primeiro andar
+
+    vel_x = 0  # Zera a velocidade horizontal para o jogador começar parado
+    vel_y = 0  # Zera a velocidade vertical para o jogador não continuar caindo
+
+    barris.clear()  # Remove todos os barris da tela para evitar colisão imediata ao respawnar
