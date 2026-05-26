@@ -608,4 +608,62 @@ while True:          # Loop infinito que mantém o jogo rodando até o programa 
                 tela_game_over()         # Exibe a tela de game over
                 pygame.quit()            # Encerra o pygame
                 sys.exit()               # Termina o programa
+
+# QUEDA FORA DO MUNDO
+    # ============================================================
+ 
+    if player.y > MUNDO_ALTURA:  # Verifica se o jogador caiu abaixo do limite inferior do mundo
+        vidas -= 1               # Subtrai uma vida do jogador
+        resetar()                # Reposiciona o jogador no início da fase
+ 
+        if vidas <= 0:           # Verifica se as vidas acabaram
+            tela_game_over()     # Exibe a tela de game over
+            pygame.quit()        # Encerra o pygame
+            sys.exit()           # Termina o programa
+ 
+    # ============================================================
+    # COLISÃO COM O OBJETIVO (avança de fase)
+    # ============================================================
+ 
+    if player.colliderect(objetivo):  # Verifica se o jogador tocou no objeto objetivo (meta da fase)
+        pontuacao += 100              # Adiciona 100 pontos de bônus por completar a fase
+        avancar_fase()                # Chama a função que configura e inicia a próxima fase
+ 
+    # ============================================================
+    # RENDERIZAÇÃO DO CENÁRIO
+    # ============================================================
+ 
+    for plat in plataformas:  # Itera por todas as plataformas do cenário
+        pygame.draw.rect(TELA, BRANCO, (plat.x, plat.y - camera_y, plat.width, plat.height))
+        # Desenha cada plataforma como um retângulo branco, deslocando y pela câmera para simular o scroll
+ 
+    for escada in escadas:  # Itera por todas as escadas do cenário
+        TELA.blit(escada_img, (escada.x, escada.y - camera_y))
+        # Desenha a imagem da escada na posição correta, deslocada pela câmera
+ 
+    for item in itens:              # Itera por todos os itens do cenário
+        desenhar_item(item, camera_y)  # Chama a função que desenha o item com animação de pulso
+ 
+    pygame.draw.rect(TELA, AMARELO, (objetivo.x, objetivo.y - camera_y, objetivo.width, objetivo.height))
+    # Desenha o objetivo (meta da fase) como um retângulo amarelo na posição correta com offset de câmera
+ 
+    TELA.blit(macaco_img, (macaco_pos[0], macaco_pos[1] - camera_y))
+    # Desenha a imagem do inimigo (macaco) na sua posição, deslocada pela câmera
+ 
+    # ============================================================
+    # RENDERIZAÇÃO DO JOGADOR
+    # ============================================================
+ 
+    TELA.blit(sprite, (player.x, player.bottom - sprite.get_height() - camera_y + 10))
+    # Desenha o sprite do jogador alinhando sua base com o fundo do rect de colisão, ajustando pela câmera e 10px extras
+ 
+    # ============================================================
+    # RENDERIZAÇÃO DOS BARRIS
+    # ============================================================
+ 
+    for b in barris:  # Itera por todos os barris ativos na lista
+        draw_y = b["rect"].bottom - barril_img.get_height() - camera_y
+        # Calcula a posição y de desenho: alinha a base da imagem com o fundo do rect do barril, descontando a câmera
+        TELA.blit(barril_img, (b["rect"].x, draw_y))
+        # Desenha a imagem do barril na posição calculada
  
