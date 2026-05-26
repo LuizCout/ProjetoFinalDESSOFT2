@@ -204,36 +204,6 @@ def tela_inicio():
         pygame.display.flip()
  
 
-
-    fonte_titulo = pygame.font.SysFont(fonte_nome, 88, bold=True)
-    fonte_sub    = pygame.font.SysFont(fonte_nome, 30, bold=True)
-
-    t = 0
-
-    while True:
-        CLOCK.tick(FPS)
-        t += 1
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                return
-
-        TELA.fill((15, 10, 30))
-        txt1 = fonte_titulo.render("DINO BARREL", True, (255, 220, 0))
-        txt2 = fonte_sub.render("Pressione ENTER", True, (255, 255, 255))
-
-        TELA.blit(txt1, (LARGURA // 2 - txt1.get_width() // 2, 250))
-        TELA.blit(txt2, (LARGURA // 2 - txt2.get_width() // 2, 360))
-
-        pygame.display.flip()
-
-        # A parte de desenho do fundo animado, título, botão e créditos está omitida no trecho fornecido
-        # mas acontece aqui dentro do loop, antes do pygame.display.flip()
-
 # FUNÇÃO: tela_transicao
 
 def tela_transicao(numero_fase):
@@ -392,8 +362,10 @@ def criar_andares():
 
     for i in range(len(andares) - 1):  # Itera pelos andares criando uma escada entre cada par de andares adjacentes
         baixo, cima = andares[i], andares[i + 1]  # Define andar inferior e andar superior do par atual
-
-        x = 100 if i % 2 == 0 else 550 if fase_atual == 1 else 150 if i % 2 == 0 else 600
+        if fase_atual == 1:
+            x = 100 if i % 2 == 0 else 550
+        else:
+            x = 150 if i % 2 == 0 else 600
         # Posiciona a escada: nos andares pares à esquerda, nos ímpares à direita; valores diferentes por fase
 
         escadas.append(pygame.Rect(x, cima["y"], 30, baixo["y"] - cima["y"]))
@@ -441,6 +413,7 @@ def desenhar_item(item, cam_y):
     item["pulso"] += 0.08  # Avança a fase da animação de pulso em 0.08 radianos por frame
 
     escala = 1.0 + 0.12 * abs(math.sin(item["pulso"]))
+    r = int(ITEM_RAIO*escala )
     # Calcula o fator de escala do item usando seno: varia entre 1.0 e 1.12, criando efeito de expansão e contração
 
     cx, cy = item["rect"].centerx, item["rect"].centery - cam_y
@@ -583,15 +556,10 @@ def tela_vitoria():
         desenhar_texto_arcade(TELA, fonte_media, f"Pontuacao Final: {pontuacao}", BRANCO, (40, 40, 40), LARGURA // 2, 400, 4)
         pygame.display.flip()
 
-def avancar_fase():
-    global fase_atual, barris, macaco_pos, objetivo, tempo_spawn
-    global poder_vel_ativo, poder_vel_timer, poder_bomb_ativo, poder_bomb_timer
-    global item_respawn_timer
-
 
     # Incrementa a fase atual e configura o jogo para a nova fase
     # Se ultrapassar a fase 2, exibe a tela de vitória e encerra o jogo
-def avancar_fase()
+def avancar_fase():
     global fase_atual, barris, macaco_pos, objetivo, tempo_spawn  # Declara variáveis globais que serão modificadas
     global poder_vel_ativo, poder_vel_timer, poder_bomb_ativo, poder_bomb_timer  # Mais variáveis globais de poder
     global item_respawn_timer  # Variável global do timer de reaparecimento de itens
@@ -778,20 +746,8 @@ while True:          # Loop infinito que mantém o jogo rodando até o programa 
 
     
     # COLISÃO DOS BARRIS COM O JOGADOR
-    
+    barris_remover=[]
 
-    if barril.colliderect(player):       # Verifica se o barril atual colide com o rect do jogador
-        if poder_bomb_ativo:             # Verifica se o poder bomba está ativo
-            barris_remover.append(b)     # Adiciona o barril à lista de barris a serem removidos (destruído pela bomba)
-            pontuacao += 10              # Adiciona 10 pontos por destruir o barril com a bomba
-        else:                            # Se o poder bomba não está ativo
-            vidas -= 1                   # Subtrai uma vida do jogador
-            resetar()                    # Reposiciona o jogador e limpa os barris
-
-            if vidas <= 0:               # Verifica se o jogador ficou sem vidas
-                tela_game_over()         # Exibe a tela de game over
-                pygame.quit()            # Encerra o pygame
-                sys.exit()               # Termina o programa
 
 # QUEDA FORA DO MUNDO
     # ============================================================
@@ -837,7 +793,14 @@ while True:          # Loop infinito que mantém o jogo rodando até o programa 
     # ============================================================
     # RENDERIZAÇÃO DO JOGADOR
     # ============================================================
- 
+    movendo = vel_x != 0 or vel_y != 0
+    frame_atual = (frame_atual + vel_anim) % len(frames) if movendo else 0
+    sprite = frames[int(frame_atual)]
+
+if vel_x < 0:
+    sprite = pygame.transform.flip(sprite, True, False)
+
+
     TELA.blit(sprite, (player.x, player.bottom - sprite.get_height() - camera_y + 10))
     # Desenha o sprite do jogador alinhando sua base com o fundo do rect de colisão, ajustando pela câmera e 10px extras
  
@@ -850,10 +813,22 @@ while True:          # Loop infinito que mantém o jogo rodando até o programa 
         # Calcula a posição y de desenho: alinha a base da imagem com o fundo do rect do barril, descontando a câmera
         TELA.blit(barril_img, (b["rect"].x, draw_y))
         # Desenha a imagem do barril na posição calculada
+        if barril.colliderect(player):       # Verifica se o barril atual colide com o rect do jogador
+            if poder_bomb_ativo:             # Verifica se o poder bomba está ativo
+                barris_remover.append(b)     # Adiciona o barril à lista de barris a serem removidos (destruído pela bomba)
+                pontuacao += 10              # Adiciona 10 pontos por destruir o barril com a bomba
+            else:                            # Se o poder bomba não está ativo
+                vidas -= 1                   # Subtrai uma vida do jogador
+                resetar()                    # Reposiciona o jogador e limpa os barris
+
+                if vidas <= 0:               # Verifica se o jogador ficou sem vidas
+                    tela_game_over()         # Exibe a tela de game over
+                    pygame.quit()            # Encerra o pygame
+                sys.exit()  
  
-# ============================================================
+
     # HUD (interface do usuário na tela)
-    # ============================================================
+
 
     texto     = fonte.render(f"Pontuação: {pontuacao}", True, BRANCO)
     # Renderiza o texto de pontuação com o valor atual em cor branca com antialiasing ativado
@@ -863,7 +838,7 @@ while True:          # Loop infinito que mantém o jogo rodando até o programa 
 
     fase_txt  = fonte.render(f"Fase: {fase_atual}", True, AMARELO)
     # Renderiza o texto de fase com o número atual em cor amarela
-
+    x_pont = LARGURA - texto.get_width() - 15
     TELA.blit(texto, (x_pont, 10))
     # Desenha o texto de pontuação na tela na posição x_pont, 10 pixels do topo
 
