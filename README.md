@@ -9,3 +9,6 @@ Como rodar o jogo:  Installe o pygame no computador
                     JOgue o jogo com a setinhas e com o espaço
                     Chegue ao topo do mapa, desviando dos barris para avançar de fase
 
+Link do vídeo:
+
+https://www.youtube.com/shorts/eIXg0mPq6Ow
