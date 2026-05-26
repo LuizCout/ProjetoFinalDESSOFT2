@@ -457,3 +457,64 @@ while True:          # Loop infinito que mantém o jogo rodando até o programa 
  
     VEL = VEL_TURBINADA if poder_vel_ativo else VEL_BASE
     # Define a velocidade atual: usa velocidade turbinada (7) se o turbo estiver ativo, senão usa a base (3)
+
+    # ============================================================
+    # MOVIMENTO HORIZONTAL DO JOGADOR
+    # ============================================================
+
+    vel_x = 0  # Zera a velocidade horizontal a cada frame para que o jogador pare ao soltar a tecla
+
+    if teclas[pygame.K_LEFT]:   # Verifica se a tecla seta esquerda está pressionada
+        vel_x = -VEL            # Define velocidade horizontal negativa (move para a esquerda)
+
+    if teclas[pygame.K_RIGHT]:  # Verifica se a tecla seta direita está pressionada
+        vel_x = VEL             # Define velocidade horizontal positiva (move para a direita)
+
+    # ============================================================
+    # DETECÇÃO DE ESCADA
+    # ============================================================
+
+    na_escada = any(player.colliderect(e) for e in escadas)
+    # Verifica se o rect do jogador colide com qualquer escada da lista; retorna True se colidir com ao menos uma
+
+    if na_escada:   # Se o jogador estiver em contato com uma escada
+        vel_y = 0   # Zera a velocidade vertical para neutralizar a gravidade enquanto está na escada
+
+        if teclas[pygame.K_UP]:    # Verifica se a seta para cima está pressionada
+            vel_y = -VEL           # Move o jogador para cima na escada com a velocidade atual
+
+        if teclas[pygame.K_DOWN]:  # Verifica se a seta para baixo está pressionada
+            vel_y = VEL            # Move o jogador para baixo na escada com a velocidade atual
+
+    else:               # Se o jogador NÃO está em uma escada
+        vel_y += GRAVIDADE  # Aplica a gravidade: acumula velocidade para baixo a cada frame
+
+    # ============================================================
+    # PULO
+    # ============================================================
+
+    if teclas[pygame.K_SPACE] and no_chao and not na_escada:
+    # Verifica: tecla espaço pressionada E jogador está no chão E jogador não está na escada
+        vel_y = PULO  # Aplica a velocidade de pulo (-7.5), lançando o jogador para cima
+
+    # ============================================================
+    # ATUALIZAÇÃO DA POSIÇÃO DO JOGADOR
+    # ============================================================
+
+    player.x += vel_x        # Move o jogador horizontalmente somando a velocidade horizontal ao x atual
+    player.y += int(vel_y)   # Move o jogador verticalmente somando a velocidade vertical (convertida para inteiro) ao y atual
+
+    player.x = max(0, min(player.x, LARGURA - player.width))
+    # Limita a posição x do jogador entre 0 e (LARGURA - largura do jogador) para não sair pelos lados da tela
+
+    # ============================================================
+    # COLISÃO COM PLATAFORMAS (por cima)
+    # ============================================================
+
+    no_chao = False  # Assume que o jogador está no ar até que uma colisão prove o contrário
+
+    for plat in plataformas:                          # Itera por todas as plataformas do cenário
+        if player.colliderect(plat) and vel_y > 0:   # Verifica colisão com a plataforma E se o jogador está caindo
+            player.bottom = plat.top                  # Alinha o fundo do jogador com o topo da plataforma (pousa sobre ela)
+            vel_y = 0                                 # Zera a velocidade vertical, parando a queda
+            no_chao = True                            # Marca que o jogador está no chão
