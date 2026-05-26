@@ -400,38 +400,31 @@ def spawn_barril():
     })
 
 
-# FUNÇÃO: avancar_fase
+def avancar_fase():
+    global fase_atual, barris, macaco_pos, objetivo, tempo_spawn
+    global poder_vel_ativo, poder_vel_timer, poder_bomb_ativo, poder_bomb_timer
+    global item_respawn_timer
 
-    # Incrementa a fase atual e configura o jogo para a nova fase
-    # Se ultrapassar a fase 2, exibe a tela de vitória e encerra o jogo
+    fase_atual += 1
 
-    global fase_atual, barris, macaco_pos, objetivo, tempo_spawn  # Declara variáveis globais que serão modificadas
-    global poder_vel_ativo, poder_vel_timer, poder_bomb_ativo, poder_bomb_timer  # Mais variáveis globais de poder
-    global item_respawn_timer  # Variável global do timer de reaparecimento de itens
+    if fase_atual > 2:
+        tela_vitoria()
+        pygame.quit()
+        sys.exit()
 
-    fase_atual += 1  # Incrementa o número da fase em 1
+    tempo_spawn = 0
+    item_respawn_timer = 0
+    poder_vel_ativo = False
+    poder_vel_timer = 0
+    poder_bomb_ativo = False
+    poder_bomb_timer = 0
 
-    if fase_atual > 2:    # Verifica se passou da última fase disponível (fase 2)
-        tela_vitoria()    # Exibe a tela de vitória com a pontuação final
-        pygame.quit()     # Encerra todos os módulos do pygame
-        sys.exit()        # Finaliza o programa Python
+    criar_andares()
+    spawnar_itens()
+    resetar()
+    barris.clear()
 
-    # Reseta todos os timers e poderes para o estado inicial da nova fase
-    tempo_spawn         = 0      # Zera o contador de spawn de barris
-    item_respawn_timer  = 0      # Zera o timer de reaparecimento de itens
-    poder_vel_ativo     = False  # Desativa o poder de velocidade
-    poder_vel_timer     = 0      # Zera o timer do poder de velocidade
-    poder_bomb_ativo    = False  # Desativa o poder bomba
-    poder_bomb_timer    = 0      # Zera o timer do poder bomba
-
-    criar_andares()   # Reconstrói as plataformas e escadas com as configurações da nova fase
-    spawnar_itens()   # Distribui novos itens pelos andares da nova fase
-
-    resetar()         # Reposiciona o jogador e limpa os barris
-    barris.clear()    # Garante que a lista de barris esteja completamente vazia (redundância de segurança)
-
-    tela_transicao(fase_atual)  # Exibe a tela de transição com o número da nova fase antes de continuar
-
+    tela_transicao(fase_atual)
 # LOOP PRINCIPAL DO JOGO
 # ============================================================
 # Este bloco roda continuamente enquanto o jogo estiver ativo.
