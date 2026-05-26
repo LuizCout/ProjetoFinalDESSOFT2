@@ -190,7 +190,7 @@ macaco_img = pygame.transform.scale(pygame.image.load(r"C:\Users\rezen\Downloads
 # Carrega a imagem do inimigo (macaco), redimensiona para 90x90 pixels e converte preservando transparência
 
 # DIVISÃO DA SPRITESHEET EM FRAMES DE ANIMAÇÃO
-# ============================================================
+
  
 FRAME_L, FRAME_A, NUM_FRAMES = 24, 24, 6
 # Define: FRAME_L = largura de cada frame (24px), FRAME_A = altura de cada frame (24px), NUM_FRAMES = total de frames (6)
@@ -321,3 +321,38 @@ def spawnar_itens():
             "ativo": True,                   # Marca o item como ativo (visível e coletável)
             "pulso": random.uniform(0, 6.28),  # Define uma fase inicial aleatória para a animação de pulso (0 a 2π radianos)
         })
+# FUNÇÃO: desenhar_item
+
+def desenhar_item(item, cam_y):
+    # Desenha um item na tela com animação de pulso (variação de tamanho)
+    # Parâmetros: item = dicionário do item | cam_y = deslocamento vertical da câmera
+
+    if not item["ativo"]:  # Se o item não está ativo (já foi coletado), encerra a função sem desenhar nada
+        return
+
+    item["pulso"] += 0.08  # Avança a fase da animação de pulso em 0.08 radianos por frame
+
+    escala = 1.0 + 0.12 * abs(math.sin(item["pulso"]))
+    # Calcula o fator de escala do item usando seno: varia entre 1.0 e 1.12, criando efeito de expansão e contração
+
+    cx, cy = item["rect"].centerx, item["rect"].centery - cam_y
+    # Obtém o centro horizontal do item e aplica o offset da câmera ao centro vertical
+
+    # A parte de desenho (círculo azul para turbo, vermelho para bomba) está omitida no trecho fornecido
+
+
+# FUNÇÃO: atualizar_camera
+
+
+def atualizar_camera():
+    # Calcula a posição vertical da câmera para seguir o jogador
+    # Mantém o jogador próximo ao centro vertical da tela
+
+    global camera_y  # Declara que vai modificar a variável global camera_y (não criar uma local)
+
+    camera_y = player.y - ALTURA // 2
+    # Posiciona a câmera para que o jogador fique no centro vertical da tela
+    # Subtrai metade da altura da tela da posição y do jogador
+
+    camera_y = max(0, min(camera_y, MUNDO_ALTURA - ALTURA))
+    # Limita a câmera entre 0 e (MUNDO_ALTURA - ALTURA) para não mostrar além dos limites do mundo
