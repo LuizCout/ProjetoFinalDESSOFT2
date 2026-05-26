@@ -117,35 +117,36 @@ def desenhar_texto_arcade(surface, fonte, texto, cor, contorno, x, y, espaco_ext
 # FUNÇÃO: tela_inicio
 
  
-def tela_inicio(): 
-    # Exibe a tela inicial animada do jogo e aguarda o jogador pressionar ENTER para iniciar
- 
-    fontes = ["Courier New", "Consolas", "Lucida Console", "monospace"]  # Lista de fontes monoespaçadas com estilo arcade preferidas
-    nomes = [f.lower() for f in pygame.font.get_fonts()]                 # Obtém a lista de todas as fontes instaladas no sistema e converte para minúsculas
- 
-    # Seleciona a primeira fonte da lista preferida que esteja disponível no sistema; usa "monospace" como fallback
+def tela_inicio():
+    fontes = ["Courier New", "Consolas", "Lucida Console", "monospace"]
+    nomes = [f.lower() for f in pygame.font.get_fonts()]
     fonte_nome = next((f for f in fontes if f.lower() in nomes), "monospace")
- 
-    # Cria objetos de fonte com tamanhos específicos para cada parte da tela inicial
-    fonte_titulo = pygame.font.SysFont(fonte_nome, 88, bold=True)   # Fonte grande para o título principal (88px, negrito)
-    fonte_sub    = pygame.font.SysFont(fonte_nome, 30, bold=True)   # Fonte média para subtítulo ou instrução (30px, negrito)
-    fonte_cred   = pygame.font.SysFont("arial", 20)                 # Fonte menor para os créditos dos desenvolvedores (Arial 20px)
-    fonte_press  = pygame.font.SysFont(fonte_nome, 26, bold=True)   # Fonte para a mensagem "pressione ENTER" (26px, negrito)
- 
-    t = 0  # Inicializa o contador de tempo em zero; será incrementado a cada frame para controlar animações
- 
-    while True:              # Loop infinito da tela inicial; só sai quando o jogador pressionar ENTER
-        CLOCK.tick(FPS)      # Limita a execução a 60 frames por segundo, mantendo o ritmo do jogo constante
-        t += 1               # Incrementa o contador de tempo em 1 a cada frame, usado nas animações da tela
- 
-        for event in pygame.event.get():                           # Lê todos os eventos pendentes do pygame (teclado, mouse, fechar janela)
-            if event.type == pygame.QUIT:                          # Verifica se o evento é o botão de fechar a janela
-                pygame.quit()                                      # Encerra todos os módulos do pygame corretamente
-                sys.exit()                                         # Termina o processo Python completamente
- 
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:  # Verifica se uma tecla foi pressionada E se essa tecla é o ENTER
-                return  # Sai da função tela_inicio(), retornando ao fluxo principal do programa para iniciar o jogo
- 
+
+    fonte_titulo = pygame.font.SysFont(fonte_nome, 88, bold=True)
+    fonte_sub    = pygame.font.SysFont(fonte_nome, 30, bold=True)
+
+    t = 0
+
+    while True:
+        CLOCK.tick(FPS)
+        t += 1
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                return
+
+        TELA.fill((15, 10, 30))
+        txt1 = fonte_titulo.render("DINO BARREL", True, (255, 220, 0))
+        txt2 = fonte_sub.render("Pressione ENTER", True, (255, 255, 255))
+
+        TELA.blit(txt1, (LARGURA // 2 - txt1.get_width() // 2, 250))
+        TELA.blit(txt2, (LARGURA // 2 - txt2.get_width() // 2, 360))
+
+        pygame.display.flip()
         # A parte de desenho do fundo animado, título, botão e créditos está omitida no trecho fornecido
         # mas acontece aqui dentro do loop, antes do pygame.display.flip()
 
