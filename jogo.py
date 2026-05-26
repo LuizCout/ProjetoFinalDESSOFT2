@@ -253,7 +253,7 @@ poder_bomb_timer  = 0      # Contador regressivo em frames que controla a duraç
 PODER_BOMB_DURACAO = 240   # Duração total da bomba em frames (240 frames = 4 segundos a 60 FPS)
 
 # FUNÇÃO: criar_andares
-# ============================================================
+
 
 def criar_andares():
     # Reconstrói toda a estrutura de plataformas e escadas da fase atual
@@ -292,3 +292,32 @@ def criar_andares():
 
         escadas.append(pygame.Rect(x, cima["y"], 30, baixo["y"] - cima["y"]))
         # Cria o rect da escada: começa no topo do andar superior, tem 30px de largura e vai até o andar inferior
+
+
+ #FUNÇÃO: spawnar_itens
+
+
+def spawnar_itens():
+    # Distribui itens aleatoriamente pelos andares do cenário
+    # Existem dois tipos de item: "velocidade" (turbo) e "bomba"
+
+    itens.clear()  # Remove todos os itens existentes antes de criar novos
+
+    indices = random.sample(range(1, len(andares) - 1), min(6, len(andares) - 2))
+    # Seleciona aleatoriamente até 6 índices de andares (excluindo o primeiro e o último) para receber itens
+
+    tipos = ["velocidade", "bomba"] * 10  # Cria uma lista com 10 pares alternados dos dois tipos de item
+    random.shuffle(tipos)                  # Embaralha a lista de tipos para distribuição aleatória
+
+    for i, idx in enumerate(indices):  # Itera pelos índices selecionados, com numeração (i) para acessar o tipo
+        andar = andares[idx]           # Obtém o dicionário do andar correspondente ao índice sorteado
+        x = random.randint(120, LARGURA - 120)  # Sorteia uma posição x aleatória dentro dos limites da tela
+        y = andar["y"] - ITEM_RAIO * 2 - 4      # Calcula a posição y do item para ficar logo acima da plataforma
+
+        itens.append({
+            "rect":  pygame.Rect(x - ITEM_RAIO, y - ITEM_RAIO, ITEM_RAIO * 2, ITEM_RAIO * 2),
+            # Cria o rect de colisão do item centralizado na posição (x, y) com tamanho igual ao diâmetro do item
+            "tipo":  tipos[i % len(tipos)],  # Atribui o tipo do item acessando a lista embaralhada com índice circular
+            "ativo": True,                   # Marca o item como ativo (visível e coletável)
+            "pulso": random.uniform(0, 6.28),  # Define uma fase inicial aleatória para a animação de pulso (0 a 2π radianos)
+        })
