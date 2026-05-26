@@ -175,3 +175,16 @@ def tela_transicao(numero_fase):
 
 
 tela_inicio()  # Chama a função da tela inicial; o programa fica parado aqui até o jogador pressionar ENTER
+
+#CARREGAMENTO DOS SPRITES E IMAGENS DO JOGO
+sheet = pygame.image.load(r"C:\Users\rezen\Downloads\dinoCharactersVersion1.1\sheets\DinoSprites - doux.png").convert_alpha()
+# Carrega a spritesheet do personagem dinossauro como superfície com transparência (canal alpha preservado)
+
+barril_img = pygame.transform.scale(pygame.image.load(r"C:\Users\rezen\Downloads\Barrel 0011.png"), (40, 40))
+# Carrega a imagem do barril e a redimensiona para 40x40 pixels
+
+escada_img = pygame.transform.scale(pygame.image.load(r"C:\Users\rezen\Downloads\wood_set\ladder\28x128\1.png"), (50, 100))
+# Carrega a imagem da escada e a redimensiona para 50x100 pixels
+
+macaco_img = pygame.transform.scale(pygame.image.load(r"C:\Users\rezen\Downloads\enemy certo.png"), (90, 90)).convert_alpha()
+# Carrega a imagem do inimigo (macaco), redimensiona para 90x90 pixels e converte preservando transparência
