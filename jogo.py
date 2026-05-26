@@ -148,3 +148,30 @@ def tela_inicio():
  
         # A parte de desenho do fundo animado, título, botão e créditos está omitida no trecho fornecido
         # mas acontece aqui dentro do loop, antes do pygame.display.flip()
+
+        # FUNÇÃO: tela_transicao
+
+
+def tela_transicao(numero_fase):
+    # Exibe uma tela intermediária entre fases mostrando o número da fase atual
+    # O parâmetro numero_fase indica qual fase está começando
+
+    while True:          # Loop infinito que mantém a tela de transição visível até o jogador pressionar ENTER
+        CLOCK.tick(FPS)  # Limita a execução a 60 FPS para manter o jogo estável durante a transição
+
+        for event in pygame.event.get():                           # Lê todos os eventos pygame disponíveis no momento
+            if event.type == pygame.QUIT:                          # Verifica se o usuário clicou no botão de fechar a janela
+                pygame.quit()                                      # Encerra todos os módulos do pygame
+                sys.exit()                                         # Termina o programa Python
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:  # Verifica se o ENTER foi pressionado
+                return  # Sai da função de transição e retorna ao loop principal para iniciar a nova fase
+
+        # Aqui seria desenhado o texto "FASE X" e "PREPARE-SE!" na tela
+        pygame.display.flip()  # Atualiza a tela, exibindo tudo que foi desenhado neste frame
+
+
+# EXECUÇÃO DA TELA INICIAL (antes de carregar o resto do jogo)
+
+
+tela_inicio()  # Chama a função da tela inicial; o programa fica parado aqui até o jogador pressionar ENTER
