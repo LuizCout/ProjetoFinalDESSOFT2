@@ -1,7 +1,6 @@
 
 # IMPORTAÇÕES DAS BIBLIOTECAS
 
-
 import pygame        # Importa a biblioteca pygame, responsável por criar a janela, desenhar na tela, capturar teclas e reproduzir sons
 import sys           # Importa o módulo sys, usado para encerrar o programa com sys.exit()
 import random        # Importa o módulo random, usado para gerar números aleatórios (posição de itens, comportamento de barris, etc.)
@@ -20,16 +19,12 @@ pygame.mixer.music.play(-1)          # Começa a tocar a música; o argumento -1
 LARGURA, ALTURA = 900, 800   # Define a largura (900 pixels) e a altura (800 pixels) da janela visível do jogo
 MUNDO_ALTURA = 1400          # Define a altura total do mundo do jogo (maior que a tela), permitindo scroll vertical com câmera
 
-
 # CRIAÇÃO DA JANELA
-
 
 TELA = pygame.display.set_mode((LARGURA, ALTURA))  # Cria a janela do jogo com as dimensões definidas acima e armazena na variável TELA
 pygame.display.set_caption("Dino Barrel")           # Define o título que aparece na barra superior da janela do jogo
 
-
 # CONTROLE DE TEMPO
-
 
 CLOCK = pygame.time.Clock()  # Cria um objeto de relógio que controla quantos frames por segundo o jogo roda
 FPS = 60                     # Define a taxa de quadros por segundo em 60 FPS (frames per second)
@@ -60,7 +55,6 @@ AMARELO_LAVA   = (255, 200, 0)   # Amarelo quente que representa o brilho incand
 
 # FUNÇÃO: desenhar_vulcao
 
-
 def desenhar_vulcao(surface, t):
     # Recebe a superfície onde vai desenhar (surface) e o contador de tempo (t) para animações
     
@@ -77,16 +71,62 @@ def desenhar_vulcao(surface, t):
     random.seed()  # Remove a semente fixa, voltando ao comportamento aleatório normal para o resto do código
 
     # --- Montanhas ao fundo ---
-    montanha = [...]  # Define os vértices do polígono que forma as montanhas ao fundo (lista de tuplas com coordenadas x, y)
+    montanha = [(0, ALTURA), (0, 500), (150, 320), (280, 420), (400, 200),(520, 380), (650, 290), (800, 430), (900, 380), (900, ALTURA)]  # Define os vértices do polígono que forma as montanhas ao fundo (lista de tuplas com coordenadas x, y)
     pygame.draw.polygon(surface, (25, 20, 40), montanha)  # Desenha as montanhas como um polígono preenchido com cor azul-roxo muito escuro
 
     # A continuação desta função (corpo do vulcão, cratera, etc.) está omitida no trecho fornecido
     # mas seguiria o mesmo padrão: polígonos para as formas e elipses para a cratera
+    vx, vy_base, vy_topo = 450, ALTURA, 260  # Centro x do vulcao, y da base e y do topo.
+    largura_base, largura_topo = 380, 90     # Larguras inferior e superior do vulcao.
+    vulcao = [(vx - largura_base // 2, vy_base), (vx - largura_topo // 2, vy_topo),
+              (vx + largura_topo // 2, vy_topo), (vx + largura_base // 2, vy_base)]
+    pygame.draw.polygon(surface, CINZA_PEDRA, vulcao)  # Corpo principal do vulcao.
 
+    lado_claro = [(vx - largura_base // 2, vy_base), (vx - largura_topo // 2, vy_topo),
+                  (vx - largura_topo // 2 + 30, vy_topo + 30), (vx - largura_base // 2 + 60, vy_base)]
+    pygame.draw.polygon(surface, CINZA_PEDRA2, lado_claro)  # Parte clara para dar profundidade.
 
+    cratera_y = vy_topo + 10  # Posicao vertical da cratera.
+    pygame.draw.ellipse(surface, (50, 20, 10), (vx - largura_topo // 2 - 10, cratera_y - 18, largura_topo + 20, 36))
+
+    # Desenha rios de lava descendo pelos lados do vulcao.
+    for lado in (-1, 1):
+        for i in range(3):
+            lx = vx + lado * (largura_topo // 2 - 10 + i * 12)
+            for seg in range(8):
+                seg_y = vy_topo + 20 + seg * 35
+                cor = VERMELHO_LAVA if seg % 2 == 0 else AMARELO_LAVA
+                pts = [(lx + lado * seg * 3, seg_y), (lx + lado * (seg * 3 + 8), seg_y + 18), (lx + lado * (seg * 3 + 4), seg_y + 35)]
+                pygame.draw.lines(surface, cor, False, pts, 4)
+
+    # Desenha particulas de lava saindo da cratera.
+    for i in range(14):
+        angulo = -math.pi / 2 + math.sin(t * 0.05 + i * 0.8) * 0.6
+        velocidade = 3 + (i % 5) * 0.8
+        px = int(vx + math.cos(angulo) * velocidade * ((t % 40) + i * 5) % 120)
+        py = int(cratera_y - 10 - (t * 2 + i * 18) % 180)
+        if py <= cratera_y:
+            cor = AMARELO_LAVA if i % 2 == 0 else VERMELHO_LAVA
+            pygame.draw.circle(surface, cor, (px, py), max(1, 4 - (i % 3)))
+
+    # Desenha fumaca transparente saindo da cratera.
+    for i in range(5):
+        sx = vx + int(math.sin(t * 0.04 + i * 1.2) * 20)
+        sy = cratera_y - 30 - (t * 1.5 + i * 22) % 100
+        if sy >= cratera_y - 130:
+            raio = 12 + i * 4
+            fuma = pygame.Surface((raio * 2, raio * 2), pygame.SRCALPHA)
+            alfa = max(0, 180 - int((cratera_y - 30 - sy) * 1.5))
+            pygame.draw.circle(fuma, (80, 70, 70, alfa), (raio, raio), raio)
+            surface.blit(fuma, (sx - raio, int(sy) - raio))
+
+    # Desenha lava no chao da tela inicial.
+    for i in range(6):
+        rx = vx - 180 + i * 70 + int(math.sin(t * 0.03 + i) * 10)
+        ry = ALTURA - 20 - (i % 3) * 8
+        pygame.draw.ellipse(surface, (180 + i * 10, 40 + i * 5, 0), (rx, ry, 50 - i * 4, 12))
 
 #FUNÇÃO: desenhar_texto_arcade
-
 
 def desenhar_texto_arcade(surface, fonte, texto, cor, contorno, x, y, espaco_extra=6):
     # Desenha um texto com estilo arcade letra por letra, permitindo espaçamento personalizado
@@ -145,16 +185,43 @@ def tela_inicio():
  
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:  # Verifica se uma tecla foi pressionada E se essa tecla é o ENTER
                 return  # Sai da função tela_inicio(), retornando ao fluxo principal do programa para iniciar o jogo
+        
+        desenhar_vulcao(TELA, t)
+        painel = pygame.Surface((700, 320), pygame.SRCALPHA)
+        painel.fill((0, 0, 0, 160))
+        TELA.blit(painel, (100, 100))
+        desenhar_texto_arcade(TELA, fonte_titulo, "DINO BARREL", AMARELO, (160, 60, 0), LARGURA // 2, 118, 8)
+        desenhar_texto_arcade(TELA, fonte_sub, "- HARD MODE -", VERMELHO, (80, 10, 10), LARGURA // 2, 228, 4)
+        for bx in (LARGURA // 2 - 130, LARGURA // 2 + 100):
+            pygame.draw.rect(TELA, LARANJA, (bx, 280, 30, 30), border_radius=6)
+            pygame.draw.rect(TELA, CINZA_PEDRA, (bx, 280, 30, 30), 2, border_radius=6)
+        pygame.draw.line(TELA, LARANJA_ESC, (200, 325), (700, 325), 2)
+        cor_enter = BRANCO if (t // 30) % 2 == 0 else AMARELO
+        contorno = (40, 40, 40) if cor_enter == BRANCO else (100, 60, 0)
+        desenhar_texto_arcade(TELA, fonte_press, "[ ENTER ] PARA JOGAR", cor_enter, contorno, LARGURA // 2, 358, 3)
+        y = ALTURA - 70
+        for linha in ["Criado por:", "Luiz Coutinho  •  Felipe Mastandrea  •  João Tristão"]:
+            txt = fonte_cred.render(linha, True, (180, 170, 160))
+            TELA.blit(txt, (LARGURA // 2 - txt.get_width() // 2, y))
+            y += 28
+        pygame.display.flip()
  
         # A parte de desenho do fundo animado, título, botão e créditos está omitida no trecho fornecido
         # mas acontece aqui dentro do loop, antes do pygame.display.flip()
 
-        # FUNÇÃO: tela_transicao
-
+# FUNÇÃO: tela_transicao
 
 def tela_transicao(numero_fase):
     # Exibe uma tela intermediária entre fases mostrando o número da fase atual
     # O parâmetro numero_fase indica qual fase está começando
+    # Exibe uma tela entre fases e espera ENTER.
+    fontes = ["Courier New", "Consolas", "Lucida Console", "monospace"]
+    nomes = [f.lower() for f in pygame.font.get_fonts()]
+    fonte_nome = next((f for f in fontes if f.lower() in nomes), "monospace")
+    fonte_grande = pygame.font.SysFont(fonte_nome, 72, bold=True)
+    fonte_media = pygame.font.SysFont(fonte_nome, 32, bold=True)
+    fonte_press = pygame.font.SysFont(fonte_nome, 24, bold=True)
+    t = 0
 
     while True:          # Loop infinito que mantém a tela de transição visível até o jogador pressionar ENTER
         CLOCK.tick(FPS)  # Limita a execução a 60 FPS para manter o jogo estável durante a transição
@@ -166,13 +233,21 @@ def tela_transicao(numero_fase):
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:  # Verifica se o ENTER foi pressionado
                 return  # Sai da função de transição e retorna ao loop principal para iniciar a nova fase
+        
+        TELA.fill((10, 10, 20))
+        painel = pygame.Surface((700, 300), pygame.SRCALPHA)
+        painel.fill((0, 0, 0, 180))
+        TELA.blit(painel, (100, 220))
+        desenhar_texto_arcade(TELA, fonte_grande, f"FASE {numero_fase}", AMARELO, (120, 60, 0), LARGURA // 2, 250, 6)
+        desenhar_texto_arcade(TELA, fonte_media, "PREPARE-SE!", BRANCO, (40, 40, 40), LARGURA // 2, 360, 4)
+        cor_enter = BRANCO if (t // 30) % 2 == 0 else AMARELO
+        desenhar_texto_arcade(TELA, fonte_press, "[ ENTER ] PARA CONTINUAR", cor_enter, (40, 40, 40), LARGURA // 2, 430, 3)
 
         # Aqui seria desenhado o texto "FASE X" e "PREPARE-SE!" na tela
         pygame.display.flip()  # Atualiza a tela, exibindo tudo que foi desenhado neste frame
 
 
 # EXECUÇÃO DA TELA INICIAL (antes de carregar o resto do jogo)
-
 
 tela_inicio()  # Chama a função da tela inicial; o programa fica parado aqui até o jogador pressionar ENTER
 
@@ -191,7 +266,6 @@ macaco_img = pygame.transform.scale(pygame.image.load(r"C:\Users\rezen\Downloads
 
 # DIVISÃO DA SPRITESHEET EM FRAMES DE ANIMAÇÃO
 
- 
 FRAME_L, FRAME_A, NUM_FRAMES = 24, 24, 6
 # Define: FRAME_L = largura de cada frame (24px), FRAME_A = altura de cada frame (24px), NUM_FRAMES = total de frames (6)
  
@@ -214,7 +288,6 @@ vel_anim    = 0.2  # Define a velocidade de troca entre frames (0.2 = avança 20
 
 # VARIÁVEIS PRINCIPAIS DO JOGADOR
 
-
 fase_atual = 1  # Armazena o número da fase atual; começa em 1
 
 player = pygame.Rect(650, 1330, 50, 50)
@@ -225,7 +298,6 @@ vel_y = 0  # Velocidade vertical do jogador; positivo = caindo, negativo = subin
 
 no_chao   = False  # Flag booleana: True se o jogador está em contato com uma plataforma abaixo dele
 na_escada = False  # Flag booleana: True se o jogador está colidindo com uma escada
-
 
 # CONSTANTES DE FÍSICA E MOVIMENTO
 
@@ -240,9 +312,7 @@ PULO          = -7.5  # Velocidade vertical aplicada ao pular (negativa = para c
 vidas     = 3  # Número de vidas do jogador; ao chegar a zero, o jogo termina
 pontuacao = 0  # Pontuação acumulada pelo jogador ao longo do jogo
 
-
 # VARIÁVEIS DOS PODERES
-
 
 poder_vel_ativo  = False  # Flag que indica se o poder de velocidade (turbo) está ativo no momento
 poder_vel_timer  = 0      # Contador regressivo em frames que controla a duração do turbo ativo
@@ -252,8 +322,19 @@ poder_bomb_ativo  = False  # Flag que indica se o poder bomba (destruição de b
 poder_bomb_timer  = 0      # Contador regressivo em frames que controla a duração da bomba ativa
 PODER_BOMB_DURACAO = 240   # Duração total da bomba em frames (240 frames = 4 segundos a 60 FPS)
 
-# FUNÇÃO: criar_andares
+ITEM_RAIO = 18  # Raio dos itens.
+ITEM_RESPAWN_INTERVALO = 600  # 600 frames = 10 segundos em 60 FPS.
+itens = []  # Lista de itens da fase.
+item_respawn_timer = 0  # Contador para reativar itens.
 
+andares, plataformas, escadas = [], [], []  # Listas de estruturas da fase.
+ALTURA_ANDAR = 115  # Distancia vertical entre andares.
+ESPESSURA = 8  # Altura das plataformas.
+
+fonte = pygame.font.SysFont("arial", 28, bold=True)  # Fonte principal do HUD.
+fonte_pow = pygame.font.SysFont("arial", 22, bold=True)  # Fonte menor dos poderes.
+
+# FUNÇÃO: criar_andares
 
 def criar_andares():
     # Reconstrói toda a estrutura de plataformas e escadas da fase atual
@@ -293,9 +374,9 @@ def criar_andares():
         escadas.append(pygame.Rect(x, cima["y"], 30, baixo["y"] - cima["y"]))
         # Cria o rect da escada: começa no topo do andar superior, tem 30px de largura e vai até o andar inferior
 
+criar_andares()
 
  #FUNÇÃO: spawnar_itens
-
 
 def spawnar_itens():
     # Distribui itens aleatoriamente pelos andares do cenário
@@ -321,6 +402,8 @@ def spawnar_itens():
             "ativo": True,                   # Marca o item como ativo (visível e coletável)
             "pulso": random.uniform(0, 6.28),  # Define uma fase inicial aleatória para a animação de pulso (0 a 2π radianos)
         })
+spawnar_itens()
+
 # FUNÇÃO: desenhar_item
 
 def desenhar_item(item, cam_y):
@@ -339,11 +422,31 @@ def desenhar_item(item, cam_y):
     # Obtém o centro horizontal do item e aplica o offset da câmera ao centro vertical
 
     # A parte de desenho (círculo azul para turbo, vermelho para bomba) está omitida no trecho fornecido
+    cor = AZUL_CLARO if item["tipo"] == "velocidade" else VERMELHO
+    cor_bg = (20, 60, 120) if item["tipo"] == "velocidade" else (100, 20, 20)
+    pygame.draw.circle(TELA, cor_bg, (cx, cy), r + 4)
+    pygame.draw.circle(TELA, cor, (cx, cy), r)
+    pygame.draw.circle(TELA, BRANCO, (cx, cy), r, 2)
+    simbolo = ">>" if item["tipo"] == "velocidade" else "*"
+    txt = fonte_pow.render(simbolo, True, BRANCO)
+    TELA.blit(txt, (cx - txt.get_width() // 2, cy - txt.get_height() // 2))
 
+def desenhar_barra_poder(nome, timer, duracao, cor, pos_y):
+    # Desenha a barra de tempo restante de um poder.
+    bx, by, bw, bh = 10, pos_y, 220, 22
+    prog = timer / duracao
+    pygame.draw.rect(TELA, CINZA_ESC, (bx, by, bw, bh), border_radius=6)
+    pygame.draw.rect(TELA, cor, (bx, by, int(bw * prog), bh), border_radius=6)
+    pygame.draw.rect(TELA, BRANCO, (bx, by, bw, bh), 2, border_radius=6)
+    TELA.blit(fonte_pow.render(nome, True, BRANCO), (bx + 6, by + 2))
+
+
+macaco_pos = (500, andares[-1]["y"] - macaco_img.get_height())  # Posicao do inimigo no topo.
+barris = []  # Lista de barris ativos.
+objetivo = pygame.Rect(500, andares[-1]["y"] - 50, 50, 50)  # Meta da fase.
 
 # FUNÇÃO: atualizar_camera
-
-
+camera_y = 0
 def atualizar_camera():
     # Calcula a posição vertical da câmera para seguir o jogador
     # Mantém o jogador próximo ao centro vertical da tela
@@ -359,7 +462,6 @@ def atualizar_camera():
 
 
 # FUNÇÃO: resetar
-
 
 def resetar():
     # Reposiciona o jogador no início do primeiro andar e limpa os barris da tela
@@ -378,7 +480,6 @@ def resetar():
 
 
 # FUNÇÃO: spawn_barril
-
 
 def spawn_barril():
     # Cria um novo barril na posição do inimigo no topo do cenário
@@ -399,12 +500,69 @@ def spawn_barril():
         "tipo": tipo  # Armazena o tipo do barril ("rapido" ou "normal") no dicionário
     })
 
+TELA DE GAME OVER
+# =========================
+def tela_game_over():
+    # Exibe a tela de derrota ate o jogador apertar qualquer tecla ou fechar.
+    fontes = ["Courier New", "Consolas", "Lucida Console", "monospace"]
+    nomes = [f.lower() for f in pygame.font.get_fonts()]
+    fonte_nome = next((f for f in fontes if f.lower() in nomes), "monospace")
+    fonte_grande = pygame.font.SysFont(fonte_nome, 80, bold=True)
+    fonte_media = pygame.font.SysFont(fonte_nome, 30, bold=True)
+    fonte_press = pygame.font.SysFont(fonte_nome, 24, bold=True)
+    t = 0
+    while True:
+        CLOCK.tick(FPS)
+        t += 1
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                pygame.quit()
+                sys.exit()
+        TELA.fill((20, 0, 0))
+        painel = pygame.Surface((700, 320), pygame.SRCALPHA)
+        painel.fill((0, 0, 0, 180))
+        TELA.blit(painel, (100, 200))
+        desenhar_texto_arcade(TELA, fonte_grande, "GAME OVER", VERMELHO, (80, 0, 0), LARGURA // 2, 230, 6)
+        desenhar_texto_arcade(TELA, fonte_media, f"Pontuacao Final: {pontuacao}", BRANCO, (40, 40, 40), LARGURA // 2, 360, 4)
+        cor_enter = BRANCO if (t // 30) % 2 == 0 else VERMELHO
+        desenhar_texto_arcade(TELA, fonte_press, "[ ENTER ] PARA SAIR", cor_enter, (40, 40, 40), LARGURA // 2, 430, 3)
+        pygame.display.flip()
+
+
+# =========================
+# TELA DE VITORIA
+# =========================
+def tela_vitoria():
+    # Exibe a tela de vitoria ate o jogador apertar qualquer tecla ou fechar.
+    fontes = ["Courier New", "Consolas", "Lucida Console", "monospace"]
+    nomes = [f.lower() for f in pygame.font.get_fonts()]
+    fonte_nome = next((f for f in fontes if f.lower() in nomes), "monospace")
+    fonte_grande = pygame.font.SysFont(fonte_nome, 80, bold=True)
+    fonte_media = pygame.font.SysFont(fonte_nome, 30, bold=True)
+    t = 0
+    while True:
+        CLOCK.tick(FPS)
+        t += 1
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                pygame.quit()
+                sys.exit()
+        TELA.fill((10, 10, 20))
+        desenhar_texto_arcade(TELA, fonte_grande, "VOCE VENCEU!", AMARELO, (120, 60, 0), LARGURA // 2, 280, 6)
+        desenhar_texto_arcade(TELA, fonte_media, f"Pontuacao Final: {pontuacao}", BRANCO, (40, 40, 40), LARGURA // 2, 400, 4)
+        pygame.display.flip()
 
 # FUNÇÃO: avancar_fase
 
     # Incrementa a fase atual e configura o jogo para a nova fase
     # Se ultrapassar a fase 2, exibe a tela de vitória e encerra o jogo
-
+def avancar_fase()
     global fase_atual, barris, macaco_pos, objetivo, tempo_spawn  # Declara variáveis globais que serão modificadas
     global poder_vel_ativo, poder_vel_timer, poder_bomb_ativo, poder_bomb_timer  # Mais variáveis globais de poder
     global item_respawn_timer  # Variável global do timer de reaparecimento de itens
