@@ -211,3 +211,26 @@ for i in range(NUM_FRAMES):                                      # Itera de 0 a 
  
 frame_atual = 0    # Inicializa o índice do frame atual de animação em 0 (primeiro frame)
 vel_anim    = 0.2  # Define a velocidade de troca entre frames (0.2 = avança 20% de um frame por tick)
+
+# VARIÁVEIS PRINCIPAIS DO JOGADOR
+
+
+fase_atual = 1  # Armazena o número da fase atual; começa em 1
+
+player = pygame.Rect(650, 1330, 50, 50)
+# Cria o retângulo de colisão do jogador na posição inicial x=650, y=1330, com tamanho 50x50 pixels
+
+vel_x = 0  # Velocidade horizontal do jogador; positivo = direita, negativo = esquerda, zero = parado
+vel_y = 0  # Velocidade vertical do jogador; positivo = caindo, negativo = subindo (pulando)
+
+no_chao   = False  # Flag booleana: True se o jogador está em contato com uma plataforma abaixo dele
+na_escada = False  # Flag booleana: True se o jogador está colidindo com uma escada
+
+
+# CONSTANTES DE FÍSICA E MOVIMENTO
+
+GRAVIDADE     = 0.6   # Aceleração da gravidade: somada à vel_y a cada frame quando o jogador está no ar
+VEL_BASE      = 3     # Velocidade horizontal normal do jogador em pixels por frame
+VEL_TURBINADA = 7     # Velocidade horizontal com o poder de turbo ativo em pixels por frame
+VEL           = VEL_BASE  # Variável de velocidade atual; começa igual à velocidade base
+PULO          = -7.5  # Velocidade vertical aplicada ao pular (negativa = para cima)
