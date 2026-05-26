@@ -82,3 +82,33 @@ def desenhar_vulcao(surface, t):
 
     # A continuação desta função (corpo do vulcão, cratera, etc.) está omitida no trecho fornecido
     # mas seguiria o mesmo padrão: polígonos para as formas e elipses para a cratera
+
+
+
+#FUNÇÃO: desenhar_texto_arcade
+
+
+def desenhar_texto_arcade(surface, fonte, texto, cor, contorno, x, y, espaco_extra=6):
+    # Desenha um texto com estilo arcade letra por letra, permitindo espaçamento personalizado
+    # Parâmetros: surface = onde desenhar | fonte = objeto de fonte do pygame | texto = string a exibir
+    #             cor = cor da letra | contorno = cor do contorno | x, y = posição central | espaco_extra = pixels extras entre letras
+
+    chars = list(texto)  # Converte a string em uma lista de caracteres individuais para iterar letra por letra
+
+    # Calcula a largura total do texto somando a largura de cada caractere mais o espaço extra entre eles
+    largura_total = sum(fonte.size(c)[0] + espaco_extra for c in chars) - espaco_extra  # Subtrai um espaço_extra para não adicionar após a última letra
+    cx = x - largura_total // 2  # Calcula a posição x inicial para que o texto fique centralizado na posição x fornecida
+
+    for c in chars:                     # Itera sobre cada caractere da lista
+        w = fonte.size(c)[0]            # Obtém a largura em pixels do caractere atual
+
+        # --- Desenha o contorno ---
+        letra_contorno = fonte.render(c, True, contorno)  # Renderiza o caractere com a cor de contorno (antialiasing ativado)
+        for dx in (-2, 0, 2):           # Itera nos deslocamentos horizontais: -2, 0 e 2 pixels
+            for dy in (-2, 0, 2):       # Itera nos deslocamentos verticais: -2, 0 e 2 pixels
+                if dx != 0 or dy != 0:  # Ignora a posição central (0,0) para não sobrescrever a letra principal
+                    surface.blit(letra_contorno, (cx + dx, y + dy))  # Desenha o contorno deslocado em 8 posições ao redor da letra
+
+        # --- Desenha a letra principal ---
+        surface.blit(fonte.render(c, True, cor), (cx, y))  # Renderiza e desenha a letra na cor principal sobre o contorno
+        cx += w + espaco_extra  # Avança a posição x para a próxima letra, somando a largura da letra atual mais o espaço extra
