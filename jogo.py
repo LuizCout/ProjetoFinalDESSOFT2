@@ -161,7 +161,7 @@ def tela_inicio():
     fontes = ["Courier New", "Consolas", "Lucida Console", "monospace"]
     nomes = [f.lower() for f in pygame.font.get_fonts()]
     fonte_nome = next((f for f in fontes if f.lower() in nomes), "monospace")
-<<<<<<< HEAD
+
  
     # Cria objetos de fonte com tamanhos específicos para cada parte da tela inicial
     fonte_titulo = pygame.font.SysFont(fonte_nome, 88, bold=True)   # Fonte grande para o título principal (88px, negrito)
@@ -203,7 +203,7 @@ def tela_inicio():
             y += 28
         pygame.display.flip()
  
-=======
+
 
     fonte_titulo = pygame.font.SysFont(fonte_nome, 88, bold=True)
     fonte_sub    = pygame.font.SysFont(fonte_nome, 30, bold=True)
@@ -230,7 +230,7 @@ def tela_inicio():
         TELA.blit(txt2, (LARGURA // 2 - txt2.get_width() // 2, 360))
 
         pygame.display.flip()
->>>>>>> 7ae465e423050f82d084c090e7b5501af48dede0
+
         # A parte de desenho do fundo animado, título, botão e créditos está omitida no trecho fornecido
         # mas acontece aqui dentro do loop, antes do pygame.display.flip()
 
@@ -525,7 +525,7 @@ def spawn_barril():
         "tipo": tipo  # Armazena o tipo do barril ("rapido" ou "normal") no dicionário
     })
 
-TELA DE GAME OVER
+#TELA DE GAME OVER
 # =========================
 def tela_game_over():
     # Exibe a tela de derrota ate o jogador apertar qualquer tecla ou fechar.
@@ -588,21 +588,20 @@ def avancar_fase():
     global poder_vel_ativo, poder_vel_timer, poder_bomb_ativo, poder_bomb_timer
     global item_respawn_timer
 
-<<<<<<< HEAD
+
     # Incrementa a fase atual e configura o jogo para a nova fase
     # Se ultrapassar a fase 2, exibe a tela de vitória e encerra o jogo
 def avancar_fase()
     global fase_atual, barris, macaco_pos, objetivo, tempo_spawn  # Declara variáveis globais que serão modificadas
     global poder_vel_ativo, poder_vel_timer, poder_bomb_ativo, poder_bomb_timer  # Mais variáveis globais de poder
     global item_respawn_timer  # Variável global do timer de reaparecimento de itens
-=======
+
     fase_atual += 1
 
     if fase_atual > 2:
         tela_vitoria()
         pygame.quit()
         sys.exit()
->>>>>>> 7ae465e423050f82d084c090e7b5501af48dede0
 
     tempo_spawn = 0
     item_respawn_timer = 0
